@@ -1,5 +1,7 @@
 functor
-import Browser
+import
+	Browser(browse:Browse)
+
 define
 	% O(N) time and O(N) stack depth
 	local Take in
@@ -12,10 +14,10 @@ define
 				end
 			end
 		end
-		{Browser.browse {Take [1 2 3 4 5] 3}}
-		{Browser.browse {Take [1 2 3 4 5] 5}}
-		{Browser.browse {Take [1 2 3 4 5] ~5}}
-		{Browser.browse {Take [1 2 3 4 5] 7}}
+		{Browse {Take [1 2 3 4 5] 3}}
+		{Browse {Take [1 2 3 4 5] 5}}
+		{Browse {Take [1 2 3 4 5] ~5}}
+		{Browse {Take [1 2 3 4 5] 7}}
 	end
 
 	% O(N) time and O(1) stack depth
@@ -34,9 +36,9 @@ define
 				{Reverse {TakeAux Xs N nil}}
 			end
 		end
-		{Browser.browse {Take [1 2 3 4 5] 3}}
-		{Browser.browse {Take [1 2 3 4 5] 5}}
-		{Browser.browse {Take [1 2 3 4 5] ~5}}
-		{Browser.browse {Take [1 2 3 4 5] 7}}
+		{Browse {Take [1 2 3 4 5] 3}}
+		{Browse {Take [1 2 3 4 5] 5}}
+		{Browse {Take [1 2 3 4 5] ~5}}
+		{Browse {Take [1 2 3 4 5] 7}}
 	end
 end

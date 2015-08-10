@@ -16,6 +16,13 @@ define
 		end
 	end
 
+	fun {ZipWithConcise BinOp Xs Ys}
+		case Xs#Ys
+		of (X|Xr)#(Y|Yr) then {BinOp X Y}|{ZipWith BinOp Xr Yr}
+		else nil
+		end
+	end
+
 	fun {Add X Y}
 		X + Y
 	end
@@ -26,5 +33,7 @@ define
 	
 	{Browse {ZipWith Add [1 2 10 ~90] [3 4 5 12]}}
 	{Browse {ZipWith Multiply [1 2 10 ~90 0] [3 4 5 12 33]}}
+	{Browse {ZipWithConcise Add [1 2 10 ~90] [3 4 5 12 2]}}
+	{Browse {ZipWithConcise Multiply [1 2 10 ~90 0] [3 4 5 12 33]}}
 
 end

@@ -1,5 +1,7 @@
 functor
-import Browser
+import
+	Browser(browse:Browse)
+
 define
 	fun {Plus X Y}
 		X + Y
@@ -16,7 +18,7 @@ define
 		[] H|T then {FoldL T BinOp {BinOp Partial H}}
 		end
 	end
-	{Browser.browse {FoldL [1 2 3] Plus 0}}
-	{Browser.browse {FoldL [1 2 3 4] Mul 1}}
-	{Browser.browse {FoldL [1 2 3] NonAssociative 0}}
+	{Browse {FoldL [1 2 3] Plus 0}}
+	{Browse {FoldL [1 2 3 4] Mul 1}}
+	{Browse {FoldL [1 2 3] NonAssociative 0}}
 end

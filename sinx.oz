@@ -20,7 +20,7 @@ define
 		if X >= 0.0 then X else ~X end
 	end
 	fun {EvalUptoEps Eps PartialResult Last SinX}
-		if {Abs (Last + SinX.1)} =< Eps then PartialResult
+		if {Abs (Last - SinX.1)} =< Eps then PartialResult
 		else
 			{EvalUptoEps Eps (PartialResult+SinX.1) SinX.1 SinX.2}
 		end

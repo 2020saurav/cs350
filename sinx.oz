@@ -4,10 +4,10 @@ import
 define
 	fun lazy {Sin X}
 		local SinAux in
-			fun {SinAux X Term}
-				X | {SinAux X*(~1.0)*X*X/((Term+1.0)*(Term+2.0)) Term+2.0}
+			fun {SinAux X NextTerm Term}
+				NextTerm | {SinAux X NextTerm*(~1.0)*X*X/((Term+1.0)*(Term+2.0)) Term+2.0}
 			end
-			{SinAux X 1.0}
+			{SinAux X X 1.0}
 		end
 	end
 	fun {EvalUptoN N PartialResult SinX}

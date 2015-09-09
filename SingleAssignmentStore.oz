@@ -11,7 +11,7 @@ fun {RetrieveFromSAS Key}
     local Value in
         Value = {Dictionary.get Store Key}
         case Value
-        of equivalence(X) then X
+        of equivalence(X) then equivalence(X)
         [] reference(X) then {RetrieveFromSAS X}
         else Value
         end

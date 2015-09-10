@@ -21,7 +21,7 @@ define
             proc {Execute}
                 Current := {Pop}
                 {Browse @Current}
-                % {Browse {Dictionary.toRecord store Store}}
+                {Browse {Dictionary.toRecord store Store}}
                 if @Current \= nil then
                     case @Current.stmt
                     of nil then {Browse 'Complete'}
@@ -64,9 +64,16 @@ define
     %             ]
     %         ]}
 
+    % {Interpret [localvar ident(x)
+    %                 [bind ident(x) [record literal(a) [literal(f1) ident(x)]]]
+    %         ]}
+
     {Interpret [localvar ident(x)
-                 [localvar ident(y)
-                    [[bind ident(x) ident(y)] [nop]]
+                [localvar ident(y)
+                    [
+                        [bind ident(x) [record literal(a) [[literal(f1) ident(y)]]]]
+                        [bind ident(y) literal(100)]
+                    ]
                 ]
             ]}
 end

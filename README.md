@@ -1,4 +1,4 @@
-# CS350A Homework 2 [Interpreter]
+# CS350A Homework 3 [Interpreter]
 
 ### Structure
 - Main.oz : Interpreter for AST

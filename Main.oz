@@ -43,6 +43,26 @@ define
                     [] [bind X Y] then
                         {Unify X Y @Current.env}
                         {Execute}
+                    % 'if-then-else'
+                    [] [conditional X S1 S2] then
+                        local Predicate in
+                            case X
+                            of ident(P) then
+                                Predicate = {RetrieveFromSAS @Current.env.P}
+                            else
+                                Predicate = X
+                            end
+                            if Predicate == literal(true) then
+                                {Push sepair(stmt:S1 env:@Current.env)}
+                            else
+                                if Predicate == literal(false) then
+                                    {Push sepair(stmt:S2 env:@Current.env)}
+                                else raise conditionNotBoolean(X) end
+                                end
+                            end
+                        end
+                        {Execute}
+
                     % S -> S1 S2. Push S2 first. Then S1
                     [] X|Xr then
                         if Xr \= nil then
@@ -82,7 +102,7 @@ define
     %                 ]
     %             ]}
 
-    % Problem 4
+    % Problem 4a
     % {Interpret  [localvar ident(x)
     %                 [bind ident(x) [record literal(a) [literal(f1) ident(x)]]]
     %             ]}
@@ -94,4 +114,26 @@ define
     %                     ]
     %                 ]
     %             ]}
+
+    % Problem 5a
+    % {Interpret  [localvar ident(x)
+    %                 [bind ident(x) literal(100)]
+    %             ]}
+
+    % Problem 6
+    % {Interpret  [localvar ident(x)
+    %                 [conditional literal(true) [bind ident(x) literal(42)] [bind ident(x) literal(0)]]
+    %             ]}
+    % {Interpret  [localvar ident(x)
+    %                 [localvar ident(y)
+    %                     [
+    %                         [bind ident(x) literal(true)]
+    %                         [conditional ident(x)
+    %                             [bind ident(y) literal(42)]
+    %                             [bind ident(y) literal(0)]
+    %                         ]
+    %                     ]
+    %                 ]
+    %             ]}
+
 end

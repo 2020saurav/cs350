@@ -54,20 +54,15 @@ define
                         {Unify X Y @Current.env}
                         {Execute}
                     % 'if-then-else'
-                    [] [conditional X S1 S2] then
+                    [] [conditional ident(P) S1 S2] then
                         local Predicate in
-                            case X
-                            of ident(P) then
-                                Predicate = {RetrieveFromSAS @Current.env.P}
-                            else
-                                Predicate = X
-                            end
+                            Predicate = {RetrieveFromSAS @Current.env.P}
                             if Predicate == literal(true) then
                                 {Push sepair(stmt:S1 env:@Current.env)}
                             else
                                 if Predicate == literal(false) then
                                     {Push sepair(stmt:S2 env:@Current.env)}
-                                else raise conditionNotBoolean(X) end
+                                else raise conditionNotBoolean(P) end
                                 end
                             end
                         end
@@ -140,9 +135,6 @@ define
     %             ]}
 
     % Problem 6
-    % {Interpret  [localvar ident(x)
-    %                 [conditional literal(true) [bind ident(x) literal(42)] [bind ident(x) literal(0)]]
-    %             ]}
     % {Interpret  [localvar ident(x)
     %                 [localvar ident(y)
     %                     [

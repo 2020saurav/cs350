@@ -19,7 +19,7 @@ define
         case X
         of ident(X1) then {Adjoin Env env(X1:{AddKeyToSAS})}
         [] [record Label Features] then
-            {DeclareListItems Features {Declare Label Env}}
+            {DeclareListItems Features Env}
         else raise declarationError(X) end
         end
     end
@@ -27,8 +27,9 @@ define
     fun {DeclareListItems ListItems Env}
         case ListItems
         of nil then Env
-        [] Item | Items then
-            {DeclareListItems Items {Declare Item.2.1 {Declare Item.1 Env}}}
+        [] [literal(_) ident(X)] | Items then
+            {DeclareListItems Items {Declare ident(X) Env}}
+        else raise illFormedRecord(ListItems) end
         end
     end
 
@@ -51,7 +52,12 @@ define
                         {Execute}
                     % 'bind operation' using unification
                     [] [bind X Y] then
-                        {Unify X Y @Current.env}
+                        case Y
+                        of [procedure ParamList S] then
+                            skip
+                        else
+                            {Unify X Y @Current.env}
+                        end
                         {Execute}
                     % 'if-then-else'
                     [] [conditional ident(P) S1 S2] then
@@ -70,8 +76,12 @@ define
                     % 'case x of p then s1 else s2 end'
                     [] [match X P S1 S2] then
                         try % if unification fails, do S2
-                            {Unify X P @Current.env} % P==X ? S1 : S2
-                            {Push sepair(stmt:S1 env:@Current.env)}
+                            local NewEnv in
+                                % {Browse P}
+                                NewEnv = {Declare P @Current.env}
+                                {Unify X P NewEnv} % P==X ? S1 : S2
+                                {Push sepair(stmt:S1 env:NewEnv)}
+                            end
                         catch incompatibleTypes(_ _) then
                             {Push sepair(stmt:S2 env:@Current.env)}
                         end
@@ -94,7 +104,7 @@ define
     % ------------------------------------ Test Cases ------------------------------------
     % Problem 1
     % {Interpret [[[[nop]]]]}
-    {Interpret [[nop] [nop] [nop]]}
+    % {Interpret [[nop] [nop] [nop]]}
 
     % Problem 2
     % {Interpret [[nop] [localvar ident(x) [nop]] [nop]]}
@@ -153,7 +163,7 @@ define
     %                     [localvar ident(z)
     %                         [
     %                             [bind ident(x) [record literal(a) [[literal(f1) literal(100)]]]]
-    %                             [match ident(x) [record literal(a) [[literal(f1) ident(y)]]]
+    %                             [match ident(x) [record literal(a) [[literal(f1) ident(n)]]]
     %                                 [bind ident(z) literal(42)]
     %                                 [bind ident(z) literal(0)]
     %                             ]
@@ -198,15 +208,16 @@ define
     %                 [localvar ident(y)
     %                     [localvar ident(z)
     %                         [
+    %                             [bind ident(y) literal(80)]
     %                             [bind ident(x) [record literal(a) [
-    %                                 [literal(f1) literal(100)]
+    %                                 [literal(f1) ident(y)]
     %                                 [literal(f2) [record literal(b) [
-    %                                     [literal(f3) literal(42)]
+    %                                     [literal(f3) ident(y)]
     %                                 ]]]
     %                             ]]]
     %                             [match ident(x) [record literal(a) [
-    %                                                 [literal(f1) literal(100)]
-    %                                                 [literal(f2) ident(y)]
+    %                                                 [literal(f1) ident(m)]
+    %                                                 [literal(f2) ident(n)]
     %                                             ]] % y will bind to record corresponding to literal(b)
     %                                 [bind ident(z) literal(42)]
     %                                 [bind ident(z) literal(0)]
@@ -215,5 +226,31 @@ define
     %                     ]
     %                 ]
     %             ]}
+    % {Interpret  [localvar ident(x)
+    %                 [localvar ident(y)
+    %                     [localvar ident(z)
+    %                         [localvar ident(u)
+    %                             [
+    %                                 [bind ident(y) literal(80)]
+    %                                 [bind ident(u) literal(100)]
+    %                                 [bind ident(x) [record literal(a) [
+    %                                     [literal(f1) ident(y)]
+    %                                     [literal(f2) [record literal(b) [
+    %                                         [literal(f3) ident(y)]
+    %                                     ]]]
+    %                                 ]]]
+    %                                 [match ident(x) [record literal(a) [
+    %                                                     [literal(f1) ident(u)] % new local u created.
+    %                                                     [literal(f2) ident(n)]
+    %                                                 ]] % y will bind to record corresponding to literal(b)
+    %                                     [bind ident(z) literal(42)]
+    %                                     [bind ident(z) literal(0)]
+    %                                 ]
+    %                             ]
+    %                         ]
+    %                     ]
+    %                 ]
+    %             ]}
+
     % --------------------------------- Test Cases End ------------------------------------
 end

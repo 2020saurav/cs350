@@ -37,6 +37,14 @@ define
         Env % TODO complete this correctly
     end
 
+    fun {GenEnvForFunction NewEnv ActualParams FormalParams Env}
+        case ActualParams#FormalParams
+        of (ident(A)|As)#(ident(F)|Fs) then
+            {GenEnvForFunction {Adjoin NewEnv env(F:Env.A)} As Fs Env}
+        else NewEnv
+        end
+    end
+
     proc {Interpret AST}
         {Push sepair(stmt:AST env:nil)}
         local Execute in
@@ -82,7 +90,6 @@ define
                     [] [match X P S1 S2] then
                         try % if unification fails, do S2
                             local NewEnv in
-                                % {Browse P}
                                 NewEnv = {Declare P @Current.env}
                                 {Unify X P NewEnv} % P==X ? S1 : S2
                                 {Push sepair(stmt:S1 env:NewEnv)}
@@ -91,6 +98,19 @@ define
                             {Push sepair(stmt:S2 env:@Current.env)}
                         end
                         {Execute}
+                    % 'function application'
+                    [] apply | ident(F) | Params then
+                        local Function FormalParams NewEnv in
+                            Function = {RetrieveFromSAS @Current.env.F}
+                            FormalParams = Function.params
+                            if {Length FormalParams} == {Length Params} then skip
+                            else raise unequalParamList(F) end
+                            end
+                            NewEnv = {GenEnvForFunction Function.env Params FormalParams @Current.env}
+                            {Push sepair(stmt:Function.stmt env:NewEnv)}
+                            {Execute}
+                        end
+
                     % S -> S1 S2. Push S2 first. Then S1
                     [] X|Xr then
                         if Xr \= nil then
@@ -109,7 +129,7 @@ define
     % ------------------------------------ Test Cases ------------------------------------
     % Problem 1
     % {Interpret [[[[nop]]]]}
-    % {Interpret [[nop] [nop] [nop]]}
+    {Interpret [[nop] [nop] [nop]]}
 
     % Problem 2
     % {Interpret [[nop] [localvar ident(x) [nop]] [nop]]}
@@ -275,6 +295,44 @@ define
     %                                                 ]
     %                                             ]
     %                             ]
+    %                         ]
+    %                     ]
+    %                 ]
+    %             ]}
+
+    % Problem 8
+    % {Interpret  [localvar ident(x)
+    %                 [localvar ident(y)
+    %                     [localvar ident(z)
+    %                         [
+    %                             [bind ident(z) literal(100)]
+    %                             [bind ident(x)  [procedure [ident(p1)]
+    %                                                 [
+    %                                                     [nop]
+    %                                                     [localvar ident(u)
+    %                                                         [bind ident(u) ident(p1)]
+    %                                                     ]
+    %                                                     [localvar ident(v)
+    %                                                         [bind ident(v) ident(z)]
+    %                                                     ]
+    %                                                 ]
+    %                                             ]
+    %                             ]
+    %                             [apply ident(x) ident(z)]
+    %                         ]
+    %                     ]
+    %                 ]
+    %             ]}
+
+    % Streaming 1s
+    % {Interpret  [localvar ident(oneList)
+    %                 [localvar ident(one)
+    %                     [
+    %                         [bind ident(one) literal(1)]
+    %                         [bind ident(oneList)    [record literal(foo)
+    %                                                     [literal(f1) ident(one)]
+    %                                                     [literal(f2) ident(oneList)]
+    %                                                 ]
     %                         ]
     %                     ]
     %                 ]

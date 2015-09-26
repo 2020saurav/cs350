@@ -33,6 +33,10 @@ define
         end
     end
 
+    fun {GetCE Stmt ParamList Env}
+        Env % TODO complete this correctly
+    end
+
     proc {Interpret AST}
         {Push sepair(stmt:AST env:nil)}
         local Execute in
@@ -54,7 +58,8 @@ define
                     [] [bind X Y] then
                         case Y
                         of [procedure ParamList S] then
-                            skip
+                            % put procedure with its CE into SAS as a record
+                            {Unify X procedure(params:ParamList stmt:S env:{GetCE S ParamList @Current.env}) @Current.env}
                         else
                             {Unify X Y @Current.env}
                         end
@@ -246,6 +251,29 @@ define
     %                                     [bind ident(z) literal(42)]
     %                                     [bind ident(z) literal(0)]
     %                                 ]
+    %                             ]
+    %                         ]
+    %                     ]
+    %                 ]
+    %             ]}
+
+    % Problem 4b, 5b
+    % {Interpret  [localvar ident(x)
+    %                 [localvar ident(y)
+    %                     [localvar ident(z)
+    %                         [
+    %                             [bind ident(z) literal(100)]
+    %                             [bind ident(x)  [procedure [ident(p1)]
+    %                                                 [
+    %                                                     [nop]
+    %                                                     [localvar ident(u)
+    %                                                         [bind ident(u) ident(y)]
+    %                                                     ]
+    %                                                     [localvar ident(v)
+    %                                                         [bind ident(v) ident(z)]
+    %                                                     ]
+    %                                                 ]
+    %                                             ]
     %                             ]
     %                         ]
     %                     ]

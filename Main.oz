@@ -33,8 +33,32 @@ define
         end
     end
 
+    fun {GetIdent Stmt}
+        {Filter {Flatten Stmt} (fun {$ X} case X of ident(_) then true else false end end)}
+    end
+
+    fun {GetCeVars Identifiers Env}
+        {Filter {Map Identifiers (fun {$ X} case X of ident(Y) then Y else nil end end)}
+                (fun {$ X} {HasFeature Env X} end)
+        }
+    end
+
+    fun {CreateCe FinalCeVars Env}
+        {FoldR FinalCeVars (fun {$ X Y} {Adjoin Y env(X:Env.X)} end) env()}
+    end
+
+    % CE = (identifiers in Stmt "intersection" identifiers in Env) - (identifiers in ParamList)
     fun {GetCE Stmt ParamList Env}
-        Env % TODO complete this correctly
+        % Env % TODO complete this correctly
+        local Identifiers IdentNames NewEnv TempVars FinalCeVars in
+            Identifiers = {GetIdent Stmt} % [ident(x) ident(y)]
+            TempVars = {GetCeVars Identifiers Env} % [x y]
+            % ParamList : [ident(u) ident(v)]
+            IdentNames = {Map ParamList (fun {$ X} case X of ident(Y) then Y else nil end end)} % [u v]
+            FinalCeVars = {Filter TempVars (fun {$ X} if {Member X IdentNames} then false else true end end)}
+            % FinalCeVars = [x y]
+            {CreateCe FinalCeVars Env}
+        end
     end
 
     fun {GenEnvForFunction NewEnv ActualParams FormalParams Env}
@@ -278,27 +302,27 @@ define
     %             ]}
 
     % Problem 4b, 5b
-    % {Interpret  [localvar ident(x)
-    %                 [localvar ident(y)
-    %                     [localvar ident(z)
-    %                         [
-    %                             [bind ident(z) literal(100)]
-    %                             [bind ident(x)  [procedure [ident(p1)]
-    %                                                 [
-    %                                                     [nop]
-    %                                                     [localvar ident(u)
-    %                                                         [bind ident(u) ident(y)]
-    %                                                     ]
-    %                                                     [localvar ident(v)
-    %                                                         [bind ident(v) ident(z)]
-    %                                                     ]
-    %                                                 ]
-    %                                             ]
-    %                             ]
-    %                         ]
-    %                     ]
-    %                 ]
-    %             ]}
+    {Interpret  [localvar ident(x)
+                    [localvar ident(y)
+                        [localvar ident(z)
+                            [
+                                [bind ident(z) literal(100)]
+                                [bind ident(x)  [procedure [ident(p1)]
+                                                    [
+                                                        [nop]
+                                                        [localvar ident(u)
+                                                            [bind ident(u) ident(y)]
+                                                        ]
+                                                        [localvar ident(v)
+                                                            [bind ident(v) ident(z)]
+                                                        ]
+                                                    ]
+                                                ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]}
 
     % Problem 8
     % {Interpret  [localvar ident(x)

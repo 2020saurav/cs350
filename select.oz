@@ -2,7 +2,7 @@ functor
 import
     Browser
 define
-    local P1 P2 P3 P4 X1 X2 X3 X4 NSelect in
+    local P1 P2 P3 P4 X1 X2 X3 NSelect in
         proc {P1}
             {Browser.browse hi}
         end

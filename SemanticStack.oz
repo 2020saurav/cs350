@@ -23,7 +23,6 @@ proc {IncreaseSuspendCount}
     SuspendCount := @SuspendCount + 1
 end
 
-
 %statement level
 proc {Push StmtEnvPair}
     MultiStack := (StmtEnvPair|@MultiStack.1) | @MultiStack.2
@@ -37,7 +36,5 @@ fun {Pop}
     [] StmtEnvPair | RemainingStack then
         MultiStack := RemainingStack | @MultiStack.2
         StmtEnvPair
-    else
-        raise foo(@MultiStack) end
     end
 end

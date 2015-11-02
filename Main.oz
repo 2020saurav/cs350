@@ -1,4 +1,4 @@
-% Assignment 3 : Interpreter for Kernel Language
+% Assignment 3 : Threads in interpreter for Kernel Language
 % Authors: Abhilash (12014), Anusha (12148), Saurav (12641)
 % Compilation: This codes compiles stand-alone using ozc compiler
 % Compile: ` ozc -c Main.oz -f Main `
@@ -239,33 +239,33 @@ define
     %             ]}
 
     % Threads
-    % {Interpret  [localvar ident(x)
-    %             [localvar ident(y)
-    %                 [
-    %                     [conditional ident(x)
-    %                         [bind ident(y) literal(42)]
-    %                         [bind ident(y) literal(0)]
-    %                     ]
-    %                     [thrd [bind ident(x) literal(true)]]
-    %                 ]
-    %             ]
-    %         ]}
-
-    % all threads get suspended
-        {Interpret  [localvar ident(x)
+    {Interpret  [localvar ident(x)
                 [localvar ident(y)
                     [
-                        [thrd [conditional ident(x)
-                            [bind ident(y) literal(true)]
-                            [bind ident(y) literal(false)]
-                        ]]
-                        [thrd [conditional ident(y)
-                            [bind ident(x) literal(true)]
-                            [bind ident(x) literal(false)]
-                        ]]
+                        [thrd [bind ident(x) literal(true)]]
+                        [conditional ident(x)
+                            [bind ident(y) literal(42)]
+                            [bind ident(y) literal(0)]
+                        ]
                     ]
                 ]
             ]}
+
+    % all threads get suspended
+        % {Interpret  [localvar ident(x)
+        %         [localvar ident(y)
+        %             [
+        %                 [thrd [conditional ident(x)
+        %                     [bind ident(y) literal(true)]
+        %                     [bind ident(y) literal(false)]
+        %                 ]]
+        %                 [thrd [conditional ident(y)
+        %                     [bind ident(x) literal(true)]
+        %                     [bind ident(x) literal(false)]
+        %                 ]]
+        %             ]
+        %         ]
+        %     ]}
 
 
 

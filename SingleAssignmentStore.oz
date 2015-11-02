@@ -18,6 +18,16 @@ fun {RetrieveFromSAS Key}
     end
 end
 
+fun {IsFree Key}
+    local Value in
+        Value = {RetrieveFromSAS Key}
+        case Value
+        of equivalence(X) then true
+        else false
+        end
+    end
+end
+
 proc {BindValueToKeyInSAS Key Val}
     {Dictionary.put Store Key Val}
 end

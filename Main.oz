@@ -70,13 +70,12 @@ define
     end
 
     proc {Interpret AST}
-        {Push sepair(stmt:AST env:nil)}
-        local Execute in
+        local Execute Loop in
             % Procedure to execute top statement on semantic stack
             proc {Execute}
                 Current := {Pop}
                 {Browse @Current}
-                {Browse {Dictionary.toRecord store Store}}
+                % {Browse {Dictionary.toRecord store Store}}
                 if @Current \= nil then
                     case @Current.stmt
                     of nil then {Browse 'Complete'}
@@ -144,10 +143,16 @@ define
                         {Execute}
                     end
                 else
-                    {Browse 'Complete'}
+                    {Browse 'Completed a Thread'}
+                    {Loop}
                 end
             end
-            {Execute}
+            proc {Loop}
+                if @MultiStack == nil then {Browse 'done!'} else {Execute} end
+            end
+            {AddNewStack sepair(stmt:AST env:nil)}
+            {Loop}
+            {Browse allDone}
         end
     end
     % ------------------------------------ Test Cases ------------------------------------
@@ -302,27 +307,27 @@ define
     %             ]}
 
     % Problem 4b, 5b
-    {Interpret  [localvar ident(x)
-                    [localvar ident(y)
-                        [localvar ident(z)
-                            [
-                                [bind ident(z) literal(100)]
-                                [bind ident(x)  [procedure [ident(p1)]
-                                                    [
-                                                        [nop]
-                                                        [localvar ident(u)
-                                                            [bind ident(u) ident(y)]
-                                                        ]
-                                                        [localvar ident(v)
-                                                            [bind ident(v) ident(z)]
-                                                        ]
-                                                    ]
-                                                ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]}
+    % {Interpret  [localvar ident(x)
+    %                 [localvar ident(y)
+    %                     [localvar ident(z)
+    %                         [
+    %                             [bind ident(z) literal(100)]
+    %                             [bind ident(x)  [procedure [ident(p1)]
+    %                                                 [
+    %                                                     [nop]
+    %                                                     [localvar ident(u)
+    %                                                         [bind ident(u) ident(y)]
+    %                                                     ]
+    %                                                     [localvar ident(v)
+    %                                                         [bind ident(v) ident(z)]
+    %                                                     ]
+    %                                                 ]
+    %                                             ]
+    %                             ]
+    %                         ]
+    %                     ]
+    %                 ]
+    %             ]}
 
     % Problem 8
     % {Interpret  [localvar ident(x)
